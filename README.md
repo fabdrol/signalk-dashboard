@@ -17,7 +17,7 @@ A few other widgets and features are planned for next versions:
 - Log/trip log
 - Water temperature
 
-Currently, the connection details to the Signal K server are hardcoded in `main.js`.
+Currently, the connection details to the Signal K server are stored in `src/config.json`. Changing them required a rebuild.
 
 ## Build scripts
 ``` bash
