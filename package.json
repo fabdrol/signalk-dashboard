@@ -1,9 +1,8 @@
 {
   "name": "volare-dashboard",
-  "version": "1.0.0",
-  "description": "Signal K dashboard for the Volare, with Depth, STW, SOG, Position, heading, AIS plotter etc",
+  "version": "0.4.2",
+  "description": "Signal K dashboard for the Volare, with Depth, STW, SOG, Position, COG, etc",
   "author": "Fabian Tollenaar <fabian@decipher.industries>",
-  "private": true,
   "scripts": {
     "dev": "node build/dev-server.js",
     "build": "node build/build.js",
