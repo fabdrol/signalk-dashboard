@@ -2,11 +2,13 @@ import Vue from 'vue'
 import SignalK from 'signalk-client'
 import App from './App'
 import Overlay from './Overlay'
+import config from './config.json'
 
 Vue.use({
   install (Vue) {
     const SignalKClient = SignalK.Client
-    Vue.$client = Vue.prototype.$client = new SignalKClient('192.168.21.118', 3000)
+    Vue.$config = Vue.prototype.$config = config
+    Vue.$client = Vue.prototype.$client = new SignalKClient(config.host, config.port)
   }
 })
 

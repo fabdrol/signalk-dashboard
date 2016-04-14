@@ -1,7 +1,7 @@
 <template>
   <div class="widget">
     <h3 class="title">Koers (over de grond)</h3>
-    <h1 class="value">{{ parseFloat(auto.value).toFixed(2) }} &deg;</h1>
+    <h1 class="value">{{ parseFloat(auto.value).toFixed(2) }}&deg;</h1>
   </div>
 </template>
 

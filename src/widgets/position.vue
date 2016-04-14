@@ -195,7 +195,7 @@
       S = 'N'
     }
 
-    return `${S} ${d}° ${m.toFixed(precision)}'`
+    return `${d}° ${m.toFixed(precision)}' ${S}`
   }
 </script>
 

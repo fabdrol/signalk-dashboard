@@ -1,9 +1,25 @@
-# volare-dashboard
+# volare-signalk-dashboard
 
-> Signal K dashboard for the Volare, with Depth, STW, SOG, Position, heading, AIS plotter etc
+> Signal K dashboard for the Volare, with Depth, STW, SOG, Position, Heading etc
 
-## Build Setup
+## Widgets
+The current version provides the following widgets:
+- Speed (over ground and through water)
+- Course (over ground)
+- Position (2D)
+- Depth
 
+Additionally, when tapping the position widget, you can input another position to calculate distance and heading to that position (useful to determine your position relative to the competition in a race, or to find out how far a point is).
+
+A few other widgets and features are planned for next versions:
+- An AIS graph with nearby vessels
+- Time (selectable timezones)
+- Log/trip log
+- Water temperature
+
+Currently, the connection details to the Signal K server are hardcoded in `main.js`.
+
+## Build scripts
 ``` bash
 # install dependencies
 npm install
@@ -23,5 +39,3 @@ npm run e2e
 # run all tests
 npm test
 ```
-
-For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).

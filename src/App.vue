@@ -70,7 +70,7 @@
             })
           }
 
-          this.$client.connectDelta('192.168.21.118:3000', this.update)
+          this.$client.connectDelta(`${this.$config.host}:${this.$config.port}`, this.update)
           return next()
         })
         .catch((err) => {
