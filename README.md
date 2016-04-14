@@ -19,6 +19,9 @@ A few other widgets and features are planned for next versions:
 
 Currently, the connection details to the Signal K server are stored in `src/config.json`. Changing them required a rebuild.
 
+## Demo
+[![Demo video](http://img.youtube.com/vi/pgFR7yZtaUQ/0.jpg)](http://www.youtube.com/watch?v=pgFR7yZtaUQ "Dashboard demo")
+
 ## Build scripts
 ``` bash
 # install dependencies
