@@ -1,5 +1,11 @@
 <template>
   <main id="app">
+    <header class="header">
+      <span class="header-utc">{{ time.utc().format('HH:mm') }} (UTC)</span>
+      <span class="header-title" @click="reload">{{ config.name }}</span>
+      <span class="header-time">{{ time.tz('Europe/Amsterdam').format('HH:mm') }}</span>
+    </header>
+
     <section class="dashboard">
       <speed :data="self.navigation.speedOverGround" type="speedOverGround" v-if="(typeof self === 'object' && typeof self.navigation === 'object' && typeof self.navigation.speedOverGround !== 'undefined')"></speed>
       <speed :data="self.navigation.speedThroughWater" type="speedThroughWater" v-if="(typeof self === 'object' && typeof self.navigation === 'object' && typeof self.navigation.speedThroughWater !== 'undefined')"></speed>
@@ -11,19 +17,19 @@
 </template>
 
 <script>
+  import moment from 'moment-timezone'
   import position from './widgets/position'
   import depth from './widgets/depth'
   import courseOverGround from './widgets/courseOverGround'
   import speed from './widgets/speed'
-  import time from './widgets/time'
+  import config from './config.json'
 
   export default {
     components: {
       'position': position,
       'courseOverGround': courseOverGround,
       'speed': speed,
-      'depth': depth,
-      'time': time
+      'depth': depth
     },
 
     data () {
@@ -32,11 +38,22 @@
         self: {},
         server: {},
         vessels: {},
-        interval: null
+        interval: null,
+        time: moment()
+      }
+    },
+
+    computed: {
+      config () {
+        return config
       }
     },
 
     methods: {
+      reload () {
+        window.location.reload()
+      },
+
       update (delta) {
         if (typeof delta !== 'object' || delta === null) {
           return
@@ -52,6 +69,10 @@
     },
 
     activate (next) {
+      this.interval = setInterval(() => {
+        this.time = moment()
+      }, 1000)
+
       this.$client
         .getSelf()
         .then((response) => {
@@ -170,14 +191,51 @@
     margin 0
     padding 0
 
+  .header
+    display block
+    width 100%
+    height 40px
+    position absolute
+    top 0
+    left 0
+    text-align center
+    // border-bottom 1px solid rgba(255, 255, 255, 0.5)
+    border-bottom 1px solid rgba(109, 188, 219, .5)
+
+    > span
+      display inline-block
+      height 40px
+      line-height 40px
+      text-transform uppercase
+      color bright-red
+      font-weight bold
+      font-size 1.1em
+
+      &.header-utc
+        position absolute
+        left 1em
+        top 0
+        color rgba(255, 255, 255, 0.8)
+        font-weight normal
+        font-size .9em
+
+      &.header-time
+        position absolute
+        right 1em
+        top 0
+        color rgba(255, 255, 255, 0.8)
+        font-weight normal
+        font-size .9em
+
   .dashboard
     display block
-    padding 2em
+    padding 4em 2em 2em 2em
+    overflow hidden
 
     .widget
       display block
       width 100%
-      margin-bottom 1em
+      margin-bottom 1.5em
       border-radius 5px
       border 1px solid light-blue
       padding .5em .75em
@@ -222,4 +280,41 @@
 
   .fade-leave
     opacity 0
+
+@media only screen and (min-device-width: 768px) and (max-device-width : 1024px) and (orientation: portrait)
+  .dashboard
+    .widget
+      width 47%
+      height 125px
+      margin-left 1.5%
+      margin-right 1.5%
+      float left
+
+      h3.title
+        font-size .9em
+
+      h1.value
+        font-size 4.5em
+
+      h2.value
+        font-size 2.25em
+
+@media only screen and (min-device-width: 768px) and (max-device-width : 1024px) and (orientation: landscape)
+  .dashboard
+    .widget
+      width 30%
+      height 125px
+      margin-left 1.5%
+      margin-right 1.5%
+      margin-bottom 2em
+      float left
+
+      h3.title
+        font-size .9em
+
+      h1.value
+        font-size 4.5em
+
+      h2.value
+        font-size 2.25em
 </style>
