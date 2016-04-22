@@ -1,3 +1,5 @@
+// require('./assets/fonts/karla.css')
+
 import Vue from 'vue'
 import SignalK from 'signalk-client'
 import App from './App'

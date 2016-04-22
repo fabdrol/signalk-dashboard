@@ -173,7 +173,7 @@
     return decimal
   }
 
-  function ddToDms (type, deg, precision = 6) {
+  function ddToDms (type, deg, precision = 3) {
     let dd = Math.abs(deg)
     let d = Math.floor(dd)
     let m = (dd - d) * 60

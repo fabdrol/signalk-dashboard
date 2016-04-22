@@ -119,21 +119,31 @@
     path = path.split('.')
 
     path.forEach((segment) => {
-      if (typeof cursor[segment] !== 'undefined') {
-        cursor = cursor[segment]
+      if (typeof cursor[segment] === 'undefined') {
+        cursor[segment] = {}
       }
+
+      cursor = cursor[segment]
     })
 
     if (typeof value === 'object' && value !== null) {
-      cursor = value
+      Object.keys(value).forEach((prop) => {
+        cursor[prop] = value[prop]
+      })
+
+      cursor.timestamp = timestamp
+      cursor.source = source
       return
     }
 
     if (typeof value !== 'undefined' && value !== null) {
       cursor.value = value
-      cursor.timestmap = timestamp
+      cursor.timestamp = timestamp
       cursor.source = source
+      return
     }
+
+    console.warn('Unknown value type:', typeof value, value)
   }
 
   function applyDeltaToSelf (self, delta) {
@@ -198,8 +208,8 @@
     position absolute
     top 0
     left 0
+    background-color dark-blue
     text-align center
-    // border-bottom 1px solid rgba(255, 255, 255, 0.5)
     border-bottom 1px solid rgba(109, 188, 219, .5)
 
     > span
