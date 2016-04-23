@@ -7,11 +7,10 @@
     </header>
 
     <section class="dashboard">
-      <speed :data="self.navigation.speedOverGround" type="speedOverGround" v-if="(typeof self === 'object' && typeof self.navigation === 'object' && typeof self.navigation.speedOverGround !== 'undefined')"></speed>
-      <speed :data="self.navigation.speedThroughWater" type="speedThroughWater" v-if="(typeof self === 'object' && typeof self.navigation === 'object' && typeof self.navigation.speedThroughWater !== 'undefined')"></speed>
-      <course-over-ground :data="self.navigation.courseOverGroundTrue" type="true" v-if="(typeof self === 'object' && typeof self.navigation === 'object' && typeof self.navigation.courseOverGroundTrue !== 'undefined')"></course-over-ground>
-      <position :data="self.navigation.position" v-if="(typeof self === 'object' && typeof self.navigation === 'object' && typeof self.navigation.position !== 'undefined')"></position>
-      <depth :data="self.environment.depth" v-if="(typeof self === 'object' && typeof self.environment === 'object' && typeof self.environment.depth !== 'undefined')"></depth>
+      <speed :history="history" :data="self.navigation" v-if="isObject(self) && isObject(self.navigation)"></speed>
+      <course :data="self.navigation" type="courseOverGroundTrue" v-if="isObject(self) && isObject(self.navigation)"></course>
+      <position :data="self.navigation.position" v-if="isObject(self) && isObject(self.navigation) && isObject(self.navigation.position)"></position>
+      <depth :history="history" :data="self.environment.depth" v-if="isObject(self) && isObject(self.environment) && isObject(self.environment.depth)"></depth>
     </section>
   </main>
 </template>
@@ -20,14 +19,14 @@
   import moment from 'moment-timezone'
   import position from './widgets/position'
   import depth from './widgets/depth'
-  import courseOverGround from './widgets/courseOverGround'
+  import course from './widgets/course'
   import speed from './widgets/speed'
   import config from './config.json'
 
   export default {
     components: {
       'position': position,
-      'courseOverGround': courseOverGround,
+      'course': course,
       'speed': speed,
       'depth': depth
     },
@@ -39,7 +38,8 @@
         server: {},
         vessels: {},
         interval: null,
-        time: moment()
+        time: moment(),
+        history: []
       }
     },
 
@@ -50,6 +50,10 @@
     },
 
     methods: {
+      isObject (mixed) {
+        return this.$isObject(mixed)
+      },
+
       reload () {
         window.location.reload()
       },
@@ -64,6 +68,11 @@
           return
         }
 
+        if (this.history.length > 100) {
+          this.history.shift()
+        }
+
+        this.history.push(JSON.parse(JSON.stringify(this.self)))
         this.self = applyDeltaToSelf(this.self, delta)
       }
     },
@@ -248,11 +257,31 @@
       margin-bottom 1.5em
       border-radius 5px
       border 1px solid light-blue
-      padding .5em .75em
-      min-height 120px
+      min-height 130px
       box-shadow 0 3px 0 rgba(109, 188, 219, .8)
       background-color lighten(dark-blue, 3%)
       transition all .25s ease-in-out
+      position relative
+
+      .widget-background
+        display block
+        width 100%
+        height 35%
+        position absolute
+        top 65%
+        left 0
+        z-index 1
+        opacity .8
+
+      .widget-contents
+        display block
+        width 100%
+        height 100%
+        position absolute
+        top 0
+        left 0
+        padding .75em
+        z-index 2
 
       &.blurred
         filter: blur(3px)
@@ -270,6 +299,29 @@
       h2.value
         font-size 2.5em
         text-align center
+
+      .combined-values
+        display block
+        width 100%
+        height 80%
+        overflow hidden
+        margin-top .5em
+
+        h1.value-right, h1.value-left
+          display block
+          width 50%
+          text-align center
+          float right
+          font-size 4em
+
+        h1.value-left
+          float left
+
+        h1 span
+          display block
+          font-size .2em
+          color bright-red
+          text-transform uppercase
 
   pre
     display block

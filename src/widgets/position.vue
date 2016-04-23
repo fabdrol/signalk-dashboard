@@ -1,8 +1,10 @@
 <template>
   <div :class="{'widget': true, 'blurred': overlayIsActive}" @click="toggleOverlay">
-    <h3 class="title">Longitude/latitude</h3>
-    <h2 class="value">{{ longitude }}</h2>
-    <h2 class="value">{{ latitude }}</h2>
+    <div class="widget-contents">
+      <h3 class="title">Longitude/latitude</h3>
+      <h2 class="value">{{ longitude }}</h2>
+      <h2 class="value">{{ latitude }}</h2>
+    </div>
   </div>
 
   <overlay v-if="overlayIsActive" transition="fade">
