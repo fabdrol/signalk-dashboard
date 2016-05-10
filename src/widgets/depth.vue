@@ -1,11 +1,5 @@
 <template>
   <div class="widget">
-    <!--
-    <div class="widget-background">
-      <vue-chart :columns="columns" :rows="rows" :options="options" chart-type="LineChart"></vue-chart>
-    </div>
-    -->
-
     <div class="widget-contents">
       <h3 class="title">Diepgang {{ auto.subtitle }}</h3>
       <h1 class="value">{{ parseFloat(auto.value).toFixed(2) }} m</h1>
@@ -15,7 +9,7 @@
 
 <script>
   export default {
-    props: ['data', 'history'],
+    props: ['data'],
 
     computed: {
       belowTransducer () {
@@ -36,20 +30,8 @@
         this.rows = []
 
         if (this.belowTransducer.value === -1 && this.belowKeel.value > -1) {
-          this.history.forEach((self) => {
-            if (this.$isObject(self) && this.$isObject(self.environment) && this.$isObject(self.environment.depth) && this.$isObject(self.environment.depth.belowKeel)) {
-              this.rows.push([ self.environment.depth.belowKeel.timestamp, -self.environment.depth.belowKeel.value ])
-            }
-          })
-
           return this.belowKeel
         }
-
-        this.history.forEach((self) => {
-          if (this.$isObject(self) && this.$isObject(self.environment) && this.$isObject(self.environment.depth) && this.$isObject(self.environment.depth.belowTransducer)) {
-            this.rows.push([ self.environment.depth.belowTransducer.timestamp, -self.environment.depth.belowTransducer.value ])
-          }
-        })
 
         return this.belowTransducer
       }

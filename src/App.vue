@@ -7,10 +7,10 @@
     </header>
 
     <section class="dashboard">
-      <speed :history="history" :data="self.navigation" v-if="isObject(self) && isObject(self.navigation)"></speed>
+      <speed :data="self.navigation" v-if="isObject(self) && isObject(self.navigation)"></speed>
       <course :data="self.navigation" type="courseOverGroundTrue" v-if="isObject(self) && isObject(self.navigation)"></course>
       <position :data="self.navigation.position" v-if="isObject(self) && isObject(self.navigation) && isObject(self.navigation.position)"></position>
-      <depth :history="history" :data="self.environment.depth" v-if="isObject(self) && isObject(self.environment) && isObject(self.environment.depth)"></depth>
+      <depth  :data="self.environment.depth" v-if="isObject(self) && isObject(self.environment) && isObject(self.environment.depth)"></depth>
     </section>
   </main>
 </template>
@@ -220,6 +220,7 @@
     background-color dark-blue
     text-align center
     border-bottom 1px solid rgba(109, 188, 219, .5)
+    z-index 9999
 
     > span
       display inline-block

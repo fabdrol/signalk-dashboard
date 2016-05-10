@@ -1,11 +1,5 @@
 <template>
   <div class="widget" :style="value.style">
-    <!--
-    <div class="widget-background">
-      <vue-chart :columns="columns" :rows="rows" :options="options" chart-type="LineChart"></vue-chart>
-    </div>
-    -->
-
     <div class="widget-contents">
       <h3 class="title">Snelheid {{ value.subtitle }}</h3>
       <h1 class="value" v-if="value.type !== 'both'">{{ parseFloat(value.value).toFixed(2) }}</h1>
@@ -26,22 +20,26 @@
 </template>
 
 <script>
+  import convert from '../convert'
+
   export default {
-    props: ['data', 'type', 'history'],
+    props: ['data', 'type'],
 
     computed: {
       value () {
         let value = {
           subtitle: '',
           type: 'both',
-          style: {}
-        }
-
-        if (this.$isObject(this.data.speedOverGround) && !this.$isObject(this.data.speedThroughWater)) {
-          value.type = 'speedThroughWater'
+          style: {},
+          value: 0,
+          values: {}
         }
 
         if (!this.$isObject(this.data.speedOverGround) && this.$isObject(this.data.speedThroughWater)) {
+          value.type = 'speedThroughWater'
+        }
+
+        if (this.$isObject(this.data.speedOverGround) && !this.$isObject(this.data.speedThroughWater)) {
           value.type = 'speedOverGround'
         }
 
@@ -62,46 +60,29 @@
             value.values = {
               left: {
                 subtitle: 'over de grond',
-                value: this.data.speedOverGround.value
+                value: convert.speed(this.data.speedOverGround.value || 0, 'm/s', 'kts')
               },
 
               right: {
                 subtitle: 'door het water',
-                value: this.data.speedThroughWater.value
+                value: convert.speed(this.data.speedThroughWater.value || 0, 'm/s', 'kts')
               }
             }
-
-            this.history.forEach((self) => {
-              if (this.$isObject(self) && this.$isObject(self.navigation) && this.$isObject(self.navigation.speedOverGround)) {
-                this.rows.push([ self.navigation.speedOverGround.timestamp, self.navigation.speedOverGround.value ])
-              }
-            })
             break
 
           case 'speedThroughWater':
             value.subtitle = '(door het water)'
-            value.value = this.data.speedThroughWater.value
-
-            this.history.forEach((self) => {
-              if (this.$isObject(self) && this.$isObject(self.navigation) && this.$isObject(self.navigation.speedThroughWater)) {
-                this.rows.push([ self.navigation.speedThroughWater.timestamp, self.navigation.speedThroughWater.value ])
-              }
-            })
+            value.value = convert.speed(this.data.speedThroughWater.value || 0, 'm/s', 'kts')
             break
 
           default: // speedOverGround
             value.subtitle = '(over de grond)'
-            value.value = this.data.speedOverGround.value
-
-            this.history.forEach((self) => {
-              if (this.$isObject(self) && this.$isObject(self.navigation) && this.$isObject(self.navigation.speedOverGround)) {
-                this.rows.push([ self.navigation.speedOverGround.timestamp, self.navigation.speedOverGround.value ])
-              }
-            })
+            value.value = convert.speed(this.data.speedOverGround.value || 0, 'm/s', 'kts')
             break
         }
 
         return value
+        // */
       }
     },
 

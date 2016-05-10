@@ -1,5 +1,5 @@
 {
-  "host": "localhost",
+  "host": "signalk.local",
   "port": 3000,
   "name": "Volare"
 }

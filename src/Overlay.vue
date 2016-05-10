@@ -21,6 +21,7 @@
     text-align center
     background-color rgba(44, 62, 80, .8)
     padding 2em
+    z-index 9999999
 
     .overlay-close
       display block

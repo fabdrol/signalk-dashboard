@@ -20,6 +20,9 @@
 </template>
 
 <script>
+  // import moment from 'moment'
+  import convert from '../convert'
+
   export default {
     props: ['data', 'type'],
 
@@ -27,7 +30,7 @@
       value () {
         let value = {
           subtitle: '',
-          type: 'both',
+          type: 'courseOverGroundTrue',
           style: {}
         }
 
@@ -52,24 +55,24 @@
             value.values = {
               left: {
                 subtitle: 'heading (true)',
-                value: this.data.headingTrue.value
+                value: convert.angle(this.data.headingTrue.value, 'rad', 'deg')
               },
 
               right: {
                 subtitle: 'koers over de grond',
-                value: this.data.courseOverGroundTrue.value
+                value: convert.angle(this.data.courseOverGroundTrue.value, 'rad', 'deg')
               }
             }
             break
 
           case 'headingTrue':
             value.subtitle = '(heading)'
-            value.value = this.data.headingTrue.value
+            value.value = convert.angle(this.data.headingTrue.value, 'rad', 'deg')
             break
 
           default: // courseOverGroundTrue
             value.subtitle = '(over de grond)'
-            value.value = this.data.courseOverGroundTrue.value
+            value.value = convert.angle(this.data.courseOverGroundTrue.value, 'rad', 'deg')
             break
         }
 
