@@ -33,19 +33,15 @@
 
     data () {
       return {
+        config,
         me: '',
         self: {},
         server: {},
         vessels: {},
         interval: null,
         time: moment(),
-        history: []
-      }
-    },
-
-    computed: {
-      config () {
-        return config
+        history: [],
+        timeout: null
       }
     },
 
@@ -68,12 +64,22 @@
           return
         }
 
+        if (this.timeout) {
+          clearTimeout(this.timeout)
+        }
+
+        /*
         if (this.history.length > 100) {
           this.history.shift()
         }
+        */
 
-        this.history.push(JSON.parse(JSON.stringify(this.self)))
+        // this.history.push(JSON.parse(JSON.stringify(this.self)))
         this.self = applyDeltaToSelf(this.self, delta)
+
+        this.timeout = setTimeout(() => {
+          console.warn('Al 30s geen update ontvangen! Data is niet meer up-to-date.')
+        }, 30000)
       }
     },
 
@@ -284,9 +290,6 @@
         padding .75em
         z-index 2
 
-      &.blurred
-        filter: blur(3px)
-
       h3.title
         color bright-red
         font-size .9em
@@ -300,6 +303,9 @@
       h2.value
         font-size 2.5em
         text-align center
+
+      .stale
+        color bright-red
 
       .combined-values
         display block
@@ -362,7 +368,26 @@
       h2.value
         font-size 2.25em
 
-@media only screen and (min-device-width: 768px) and (max-device-width : 1024px) and (orientation: landscape)
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: landscape)
+  .dashboard
+    .widget
+      width 47%
+      height 130px
+      margin-left 1.5%
+      margin-right 1.5%
+      margin-bottom 2em
+      float left
+
+      h3.title
+        font-size .9em
+
+      h1.value
+        font-size 4.5em
+
+      h2.value
+        font-size 2.25em
+
+@media only screen and (min-device-width: 1024px)
   .dashboard
     .widget
       width 30%

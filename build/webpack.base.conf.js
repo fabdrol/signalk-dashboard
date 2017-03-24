@@ -73,5 +73,9 @@ module.exports = {
   },
   vue: {
     loaders: utils.cssLoaders()
-  }
+  },
+  externals: ['mdns'],
+  node: {
+    fs: 'empty'
+  },
 }

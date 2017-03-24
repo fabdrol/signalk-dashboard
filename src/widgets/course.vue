@@ -2,15 +2,15 @@
   <div class="widget" :style="value.style">
     <div class="widget-contents">
       <h3 class="title">Koers {{ value.subtitle }}</h3>
-      <h1 class="value" v-if="value.type !== 'both'">{{ parseFloat(value.value).toFixed(2) }}&deg;</h1>
+      <h1 class="value" :class="{'stale':stale}" v-if="value.type !== 'both'">{{ parseFloat(value.value).toFixed(2) }}&deg;</h1>
 
       <div class="combined-values" v-if="value.type === 'both'">
-        <h1 class="value-left">
+        <h1 class="value-left" :class="{'stale':stale}">
           {{ parseFloat(value.values.left.value).toFixed(2) }}&deg;
           <span>{{ value.values.left.subtitle }}</span>
         </h1>
 
-        <h1 class="value-right">
+        <h1 class="value-right" :class="{'stale':stale}">
           {{ parseFloat(value.values.right.value).toFixed(2) }}&deg;
           <span>{{ value.values.right.subtitle }}</span>
         </h1>
@@ -20,13 +20,30 @@
 </template>
 
 <script>
-  // import moment from 'moment'
+  import moment from 'moment'
   import convert from '../convert'
 
   export default {
     props: ['data', 'type'],
 
+    data () {
+      return {
+        last: -1
+      }
+    },
+
     computed: {
+      stale () {
+        if (this.last === -1) {
+          this.last = moment(this.data.timestamp).valueOf()
+          return false
+        }
+
+        const age = moment(this.data.timestamp).valueOf() - this.last
+        this.last = moment(this.data.timestamp).valueOf()
+        return (age > 10000)
+      },
+
       value () {
         let value = {
           subtitle: '',

@@ -2,16 +2,29 @@
   <div class="widget">
     <div class="widget-contents">
       <h3 class="title">Diepgang {{ auto.subtitle }}</h3>
-      <h1 class="value">{{ parseFloat(auto.value).toFixed(2) }} m</h1>
+      <h1 class="value" :class="{ 'stale': stale }">{{ parseFloat(auto.value).toFixed(2) }} m</h1>
     </div>
   </div>
 </template>
 
 <script>
+  import moment from 'moment'
+  
   export default {
     props: ['data'],
 
     computed: {
+      stale () {
+        if (this.last === -1) {
+          this.last = moment(this.data.timestamp).valueOf()
+          return false
+        }
+
+        const age = moment(this.data.timestamp).valueOf() - this.last
+        this.last = moment(this.data.timestamp).valueOf()
+        return (age > 10000)
+      },
+
       belowTransducer () {
         return {
           subtitle: '(onder de transducer)',
@@ -40,6 +53,7 @@
     data () {
       return {
         rows: [],
+        last: -1,
         columns: [
           { 'type': 'string', 'label': 'timestamp' },
           { 'type': 'number', 'label': 'depth' }

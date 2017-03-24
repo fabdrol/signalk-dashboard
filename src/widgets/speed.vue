@@ -2,15 +2,15 @@
   <div class="widget" :style="value.style">
     <div class="widget-contents">
       <h3 class="title">Snelheid {{ value.subtitle }}</h3>
-      <h1 class="value" v-if="value.type !== 'both'">{{ parseFloat(value.value).toFixed(2) }}</h1>
+      <h1 class="value" v-if="value.type !== 'both'" :class="{'stale':stale}">{{ parseFloat(value.value).toFixed(2) }}</h1>
 
       <div class="combined-values" v-if="value.type === 'both'">
-        <h1 class="value-left">
+        <h1 class="value-left" :class="{'stale':stale}">
           {{ parseFloat(value.values.left.value).toFixed(2) }}
           <span>{{ value.values.left.subtitle }}</span>
         </h1>
 
-        <h1 class="value-right">
+        <h1 class="value-right" :class="{'stale':stale}">
           {{ parseFloat(value.values.right.value).toFixed(2) }}
           <span>{{ value.values.right.subtitle }}</span>
         </h1>
@@ -20,12 +20,24 @@
 </template>
 
 <script>
+  import moment from 'moment'
   import convert from '../convert'
 
   export default {
     props: ['data', 'type'],
 
     computed: {
+      stale () {
+        if (this.last === -1) {
+          this.last = moment(this.data.timestamp).valueOf()
+          return false
+        }
+
+        const age = moment(this.data.timestamp).valueOf() - this.last
+        this.last = moment(this.data.timestamp).valueOf()
+        return (age > 10000)
+      },
+
       value () {
         let value = {
           subtitle: '',
@@ -89,6 +101,7 @@
     data () {
       return {
         rows: [],
+        last: -1,
         columns: [
           { 'type': 'string', 'label': 'timestamp' },
           { 'type': 'number', 'label': 'speed' }

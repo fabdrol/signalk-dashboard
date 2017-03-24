@@ -1,49 +1,53 @@
 <template>
-  <div :class="{'widget': true, 'blurred': overlayIsActive}" @click="toggleOverlay">
+  <div :class="{'widget': true }" @click="toggleOverlay">
     <div class="widget-contents">
       <h3 class="title">Longitude/latitude</h3>
-      <h2 class="value">{{ longitude }}</h2>
-      <h2 class="value">{{ latitude }}</h2>
+      <h2 class="value" :class="{ 'stale': stale }">{{ longitude }}</h2>
+      <h2 class="value" :class="{ 'stale': stale }">{{ latitude }}</h2>
     </div>
+
+    <overlay v-if="overlayIsActive" transition="fade">
+      <div class="calculate-distance-form">
+        <div class="form-group group-longitude">
+          <label>Longitude</label>
+          <input class="form-input degrees" type="text" name="form.longitude.degrees" v-model="form.longitude.degrees" placeholder="5°">
+          <input class="form-input minutes" type="text" name="form.longitude.minutes" v-model="form.longitude.minutes" placeholder="26'">
+          <input class="form-input seconds" type="text" name="form.longitude.seconds" v-model="form.longitude.seconds" placeholder="14.9''">
+        </div>
+
+        <div class="form-group group-latitude">
+          <label>Latitude</label>
+          <input class="form-input degrees" type="text" name="form.latitude.degrees" v-model="form.latitude.degrees" placeholder="5°">
+          <input class="form-input minutes" type="text" name="form.latitude.minutes" v-model="form.latitude.minutes" placeholder="26'">
+          <input class="form-input seconds" type="text" name="form.latitude.seconds" v-model="form.latitude.seconds" placeholder="14.9''">
+        </div>
+
+        <div class="form-button" @click="calculate">Bereken</div>
+        <div class="form-button form-button-white" @click="closeOverlay">Sluiten</div>
+
+        <div class="widget" style="height: 160px" v-if="form.calculated.distance > -1" transition="fade">
+          <h3 class="title" style="margin-top: .5em">Afstand (great circle)</h3>
+          <h2 class="value">{{ form.calculated.distance }} nm</h2>
+          <br>
+          <h3 class="title">Richting</h3>
+          <h2 class="value">{{ form.calculated.bearingLabel }} {{ form.calculated.bearing }}°</h2>
+        </div>
+      </div>
+    </overlay>
   </div>
-
-  <overlay v-if="overlayIsActive" transition="fade">
-    <div class="calculate-distance-form">
-      <div class="form-group group-longitude">
-        <label>Longitude</label>
-        <input class="form-input degrees" type="text" name="form.longitude.degrees" v-model="form.longitude.degrees" placeholder="5°">
-        <input class="form-input minutes" type="text" name="form.longitude.minutes" v-model="form.longitude.minutes" placeholder="26'">
-        <input class="form-input seconds" type="text" name="form.longitude.seconds" v-model="form.longitude.seconds" placeholder="14.9''">
-      </div>
-
-      <div class="form-group group-latitude">
-        <label>Latitude</label>
-        <input class="form-input degrees" type="text" name="form.latitude.degrees" v-model="form.latitude.degrees" placeholder="5°">
-        <input class="form-input minutes" type="text" name="form.latitude.minutes" v-model="form.latitude.minutes" placeholder="26'">
-        <input class="form-input seconds" type="text" name="form.latitude.seconds" v-model="form.latitude.seconds" placeholder="14.9''">
-      </div>
-
-      <div class="form-button" @click="calculate">Bereken</div>
-      <div class="form-button form-button-white" @click="toggleOverlay">Sluiten</div>
-
-      <div class="widget" v-if="form.calculated.distance > -1" transition="fade">
-        <h3 class="title">Afstand (great circle)</h3>
-        <h2 class="value">{{ form.calculated.distance }} nm</h2>
-        <br>
-        <h3 class="title">Richting</h3>
-        <h2 class="value">{{ form.calculated.bearingLabel }} {{ form.calculated.bearing }}°</h2>
-      </div>
-    </div>
-  </overlay>
 </template>
 
 <script>
+  import moment from 'moment'
+
   export default {
     props: ['data'],
 
     data () {
       return {
         overlayIsActive: false,
+        overlayIsToggling: false,
+        last: -1,
         form: {
           calculated: {
             distance: -1,
@@ -67,8 +71,30 @@
     },
 
     methods: {
-      toggleOverlay () {
+      toggleOverlay (e) {
+        if (e.target.className.indexOf('form-button') !== -1 || e.target.className.indexOf('form-input') !== -1) {
+          return
+        }
+
+        if (this.overlayIsToggling === true) {
+          return
+        }
+
+        this.overlayIsToggling = true
         this.overlayIsActive = !this.overlayIsActive
+
+        setTimeout(() => {
+          this.overlayIsToggling = false
+        }, 100)
+      },
+
+      closeOverlay () {
+        this.overlayIsToggling = true
+        this.overlayIsActive = false
+
+        setTimeout(() => {
+          this.overlayIsToggling = false
+        }, 100)
       },
 
       calculate () {
@@ -112,6 +138,17 @@
     },
 
     computed: {
+      stale () {
+        if (this.last === -1) {
+          this.last = moment(this.data.timestamp).valueOf()
+          return false
+        }
+
+        const age = moment(this.data.timestamp).valueOf() - this.last
+        this.last = moment(this.data.timestamp).valueOf()
+        return (age > 10000)
+      },
+
       longitude () {
         return ddToDms('longitude', this.data.longitude || 0.0)
       },
