@@ -66,7 +66,8 @@ module.exports = {
           name: utils.assetsPath('[name].[hash:7].[ext]')
         }
       }
-    ]
+    ],
+    noParse: /README|LICENSE|CHANGELOG|(.+)\.md/i
   },
   eslint: {
     formatter: require('eslint-friendly-formatter')

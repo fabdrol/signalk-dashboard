@@ -63,10 +63,6 @@
 
         switch (value.type) {
           case 'both':
-            value.style = {
-              height: '150px'
-            }
-
             this.options.height = (150 * 0.35)
 
             value.values = {

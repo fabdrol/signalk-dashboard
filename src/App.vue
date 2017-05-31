@@ -2,15 +2,37 @@
   <main id="app">
     <header class="header">
       <span class="header-utc">{{ time.utc().format('HH:mm') }} (UTC)</span>
-      <span class="header-title" @click="reload">{{ config.name }}</span>
+      <span class="header-title" @click="reconnect">{{ config.name }}</span>
       <span class="header-time">{{ time.tz('Europe/Amsterdam').format('HH:mm') }}</span>
     </header>
 
-    <section class="dashboard">
+    <section class="dashboard" v-if="connected === true && loading === false">
       <speed :data="self.navigation" v-if="isObject(self) && isObject(self.navigation)"></speed>
       <course :data="self.navigation" type="courseOverGroundTrue" v-if="isObject(self) && isObject(self.navigation)"></course>
       <position :data="self.navigation.position" v-if="isObject(self) && isObject(self.navigation) && isObject(self.navigation.position)"></position>
       <depth  :data="self.environment.depth" v-if="isObject(self) && isObject(self.environment) && isObject(self.environment.depth)"></depth>
+    </section>
+
+    <section class="is-loading" v-if="loading === true">
+      Momentje...
+    </section>
+
+    <section class="is-disconnected" v-if="loading === false && connected === false">
+      Kon geen verbinding maken.<br>
+      <div class="form-button form-button-white" style="width: 200px; display: inline-block;" @click="reconnectOverlayIsActive = true">Opnieuw proberen?</div>
+
+      <overlay v-if="reconnectOverlayIsActive" transition="fade">
+        <div class="reconnect-form">
+          <div class="form-group" style="height: auto;">
+            <label>Signal K server</label>
+            <input class="form-input host" style="display: block; width: 100%; margin-bottom: .5em;" type="text" name="setconfig.host" v-model="setconfig.host" placeholder="demo.signalk.org">
+            <input class="form-input port" style="display: block; width: 100%;" type="text" name="setconfig.port" v-model="setconfig.port" placeholder="80">
+          </div>
+
+          <div class="form-button" @click="reconnect">Verbinden</div>
+          <div class="form-button form-button-white" @click="reconnectOverlayIsActive = false">Annuleren</div>
+        </div>
+      </overlay>
     </section>
   </main>
 </template>
@@ -41,7 +63,14 @@
         interval: null,
         time: moment(),
         history: [],
-        timeout: null
+        timeout: null,
+        connected: false,
+        loading: true,
+        reconnectOverlayIsActive: false,
+        setconfig: {
+          host: config.host,
+          port: config.port,
+        }
       }
     },
 
@@ -80,19 +109,35 @@
         this.timeout = setTimeout(() => {
           console.warn('Al 30s geen update ontvangen! Data is niet meer up-to-date.')
         }, 30000)
-      }
-    },
+      },
 
-    activate (next) {
-      this.interval = setInterval(() => {
-        this.time = moment()
-      }, 1000)
+      reconnect (initial, next) {
+        if (initial !== true) {
+          // Set new config based on input
+          const c = this.setconfig
+          this.$config.host = c.host === '' ? 'demo.signalk.org' : c.host
+          this.$config.port = (c.port === '' || c.port === 0) ? 80 : c.port
 
-      this.$client
+          // Change hostname/port inside the $client
+          this.$client.hostname = this.$config.host
+          this.$client.port = this.$config.port
+        }
+
+        if (typeof next !== 'function') {
+          next = () => { console.log(`Reconnected to ${this.$config.host}:${this.$config.port}`) }
+        }
+
+        this.loading = true
+        this.connected = false
+
+        this
+        .$client
         .getSelf()
         .then((response) => {
           this.self = response.body
           this.me = this.self.uuid
+          this.connected = true
+          this.loading = false
           return this.$client.apiGet('/vessels')
         })
         .then((response) => {
@@ -109,10 +154,20 @@
           this.$client.connectDelta(`${this.$config.host}:${this.$config.port}`, this.update)
           return next()
         })
-        .catch((err) => {
-          console.error('Error retrieving self: ' + err.message)
+        .catch(() => {
+          this.connected = false
+          this.loading = false
           return next()
         })
+      },
+    },
+
+    activate (next) {
+      this.interval = setInterval(() => {
+        this.time = moment()
+      }, 1000)
+
+      this.reconnect(true, next)
     }
   }
 
@@ -253,6 +308,13 @@
         font-weight normal
         font-size .9em
 
+  .is-loading, .is-disconnected
+    display block
+    padding 4em 2em 2em 2em
+    overflow hidden
+    text-align center
+    color white
+
   .dashboard
     display block
     padding 4em 2em 2em 2em
@@ -264,7 +326,7 @@
       margin-bottom 1.5em
       border-radius 5px
       border 1px solid light-blue
-      min-height 130px
+      height 150px
       box-shadow 0 3px 0 rgba(109, 188, 219, .8)
       background-color lighten(dark-blue, 3%)
       transition all .25s ease-in-out
@@ -350,7 +412,7 @@
   .fade-leave
     opacity 0
 
-@media only screen and (min-device-width: 768px) and (max-device-width : 1024px) and (orientation: portrait)
+@media only screen and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait)
   .dashboard
     .widget
       width 47%
@@ -368,11 +430,11 @@
       h2.value
         font-size 2.25em
 
-@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: landscape)
+@media only screen and (min-width: 768px) and (max-width: 1024px) and (orientation: landscape)
   .dashboard
     .widget
       width 47%
-      height 130px
+      height 160px
       margin-left 1.5%
       margin-right 1.5%
       margin-bottom 2em
@@ -387,11 +449,11 @@
       h2.value
         font-size 2.25em
 
-@media only screen and (min-device-width: 1024px)
+@media only screen and (min-width: 1024px)
   .dashboard
     .widget
       width 30%
-      height 125px
+      height 150px
       margin-left 1.5%
       margin-right 1.5%
       margin-bottom 2em

@@ -1,6 +1,8 @@
 <template>
   <div class="overlay-background">
-    <slot></slot>
+    <div class="overlay-wrapper">
+      <slot></slot>
+    </div>
   </div>
 </template>
 
@@ -23,6 +25,11 @@
     padding 2em
     z-index 9999999
 
+    .overlay-wrapper
+      display block
+      width 100%
+      margin 0 auto
+
     .overlay-close
       display block
       width 50px
@@ -34,4 +41,14 @@
       position absolute
       top 20px
       right 20px
+
+  @media only screen and (min-width: 768px)
+    .overlay-background
+      .overlay-wrapper
+        width 60%
+
+  @media only screen and (min-width: 1024px)
+    .overlay-background
+      .overlay-wrapper
+        width 50%
 </style>

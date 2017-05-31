@@ -1,7 +1,7 @@
 {
-  "name": "volare-signalk-dashboard",
-  "version": "0.5.1",
-  "description": "Signal K dashboard for the Volare, with Depth, STW, SOG, Position, COG, etc",
+  "name": "signalk-dashboard",
+  "version": "0.6.0",
+  "description": "Signal K dashboard with depth, STW, SOG, position, COG, HDM/HDT",
   "author": "Fabian Tollenaar <fabian@decipher.industries>",
   "scripts": {
     "dev": "node build/dev-server.js",
