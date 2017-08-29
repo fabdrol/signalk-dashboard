@@ -67,6 +67,7 @@
         connected: false,
         loading: true,
         reconnectOverlayIsActive: false,
+        pollTimeout: null,
         setconfig: {
           host: config.host,
           port: config.port,
@@ -84,6 +85,10 @@
       },
 
       update (delta) {
+        if (this.config.websockets === false) {
+          return
+        }
+
         if (typeof delta !== 'object' || delta === null) {
           return
         }
@@ -97,13 +102,6 @@
           clearTimeout(this.timeout)
         }
 
-        /*
-        if (this.history.length > 100) {
-          this.history.shift()
-        }
-        */
-
-        // this.history.push(JSON.parse(JSON.stringify(this.self)))
         this.self = applyDeltaToSelf(this.self, delta)
 
         this.timeout = setTimeout(() => {
@@ -124,7 +122,7 @@
         }
 
         if (typeof next !== 'function') {
-          next = () => { console.log(`Reconnected to ${this.$config.host}:${this.$config.port}`) }
+          next = () => {}
         }
 
         this.loading = true
@@ -151,7 +149,12 @@
             })
           }
 
-          this.$client.connectDelta(`${this.$config.host}:${this.$config.port}`, this.update)
+          if (this.config.websockets === true) {
+            this.$client.connectDelta(`${this.$config.host}:${this.$config.port}`, this.update)
+          } else {
+            this.pollTimeout = setTimeout(this.poll.bind(this), this.config.refreshRate)
+          }
+
           return next()
         })
         .catch(() => {
@@ -159,6 +162,15 @@
           this.loading = false
           return next()
         })
+      },
+
+      poll () {
+        if (this.pollTimeout !== null) {
+          clearTimeout(this.pollTimeout)
+          this.pollTimeout = null
+        }
+
+        this.reconnect()
       },
     },
 

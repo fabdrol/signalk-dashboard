@@ -1,5 +1,7 @@
 {
-  "host": "decipher-marine-02.local",
+  "host": "95.97.138.90",
   "port": 3000,
-  "name": "X-Miles"
+  "name": "X-Miles",
+  "websockets": false,
+  "refreshRate": 2000
 }
