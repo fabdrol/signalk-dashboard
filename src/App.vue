@@ -164,7 +164,7 @@
         })
       },
 
-      reload () {
+      reloadData () {
         this
         .$client
         .getSelf()
@@ -204,7 +204,7 @@
           this.pollTimeout = null
         }
 
-        this.reload()
+        this.reloadData()
       },
     },
 
