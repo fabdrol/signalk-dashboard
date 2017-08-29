@@ -1,0 +1,9 @@
+export const SET_POSITION = 1001
+export const SET_COG_TRUE = 1002
+export const SET_COG_MAG = 1003
+export const SET_SOG = 1004
+export const SET_STW = 1005
+export const SET_DEPTH = 2001
+export const SET_IDENTITY = 3001
+export const SET_LOCAL_TIME = 4001
+export const SET_UTC_TIME = 4002

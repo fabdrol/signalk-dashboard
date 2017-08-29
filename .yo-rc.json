@@ -1,0 +1,9 @@
+{
+  "generator-react-webpack": {
+    "appName": "volare-dashboard",
+    "style": "stylus",
+    "cssmodules": true,
+    "postcss": true,
+    "generatedWithVersion": 4
+  }
+}
