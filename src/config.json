@@ -3,5 +3,5 @@
   "port": 3000,
   "name": "X-Miles",
   "websockets": false,
-  "refreshRate": 2000
+  "refreshRate": 1000
 }

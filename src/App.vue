@@ -164,13 +164,50 @@
         })
       },
 
+      reload () {
+        this
+        .$client
+        .getSelf()
+        .then((response) => {
+          this.self = response.body
+          this.me = this.self.uuid
+          this.connected = true
+          this.loading = false
+          return this.$client.apiGet('/vessels')
+        })
+        .then((response) => {
+          if (typeof response.body === 'object' && response.body !== null) {
+            this.vessels = filterObject(response.body, (vessel, id) => {
+              if (id === this.me) {
+                return false
+              }
+
+              return true
+            })
+          }
+
+          if (this.config.websockets === true) {
+            this.$client.connectDelta(`${this.$config.host}:${this.$config.port}`, this.update)
+          } else {
+            this.pollTimeout = setTimeout(this.poll.bind(this), this.config.refreshRate)
+          }
+
+          return next()
+        })
+        .catch(() => {
+          this.connected = false
+          this.loading = false
+          return next()
+        })
+      },
+
       poll () {
         if (this.pollTimeout !== null) {
           clearTimeout(this.pollTimeout)
           this.pollTimeout = null
         }
 
-        this.reconnect()
+        this.reload()
       },
     },
 
