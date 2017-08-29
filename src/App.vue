@@ -191,13 +191,10 @@
           } else {
             this.pollTimeout = setTimeout(this.poll.bind(this), this.config.refreshRate)
           }
-
-          return next()
         })
         .catch(() => {
           this.connected = false
           this.loading = false
-          return next()
         })
       },
 
